@@ -13,13 +13,16 @@ if (!empty($_POST))
   $nickname = $_POST['nickname'];
   $comment = $_POST['comment'];
 
-  $sql='INSERT INTO `posts`(`nickname`,`comment`) VALUES(?,?)';
-  //インジェクション
-  $data[]=$nickname;
-  $data[]=$comment;
+if(!empty($nickname||$comment))
+  {
+    $sql='INSERT INTO `posts`(`nickname`,`comment`) VALUES(?,?)';
+    //インジェクション
+    $data[]=$nickname;
+    $data[]=$comment;
 
-  $stmt=$dbh->prepare($sql);
-  $stmt->execute($data);
+    $stmt=$dbh->prepare($sql);
+    $stmt->execute($data);
+  }
 }
 //データベースの切断
 $dbh=null;
