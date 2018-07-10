@@ -1,6 +1,28 @@
 <?php
   // ここにDBに登録する処理を記述する
+$dsn = 'mysql:dbname=oneline_bbs;host=localhost';
+$user = 'root';
+$password='';
+$dbh = new PDO($dsn, $user, $password);
+$dbh->query('SET NAMES utf8');
 
+//SQL文を実行する
+//空の送信入るのやめたいが、やめれない、、どうして？
+if (!empty($_POST))
+{
+  $nickname = $_POST['nickname'];
+  $comment = $_POST['comment'];
+
+  $sql='INSERT INTO `posts`(`nickname`,`comment`) VALUES(?,?)';
+  //インジェクション
+  $data[]=$nickname;
+  $data[]=$comment;
+
+  $stmt=$dbh->prepare($sql);
+  $stmt->execute($data);
+}
+//データベースの切断
+$dbh=null;
 ?>
 <!DOCTYPE html>
 <html lang="ja">
