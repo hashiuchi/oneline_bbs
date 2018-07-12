@@ -1,6 +1,4 @@
 <?php
-  // ここにDBに登録する処理を記述する
-date_default_timezone_set('Asia/Tokyo');
 $dsn = 'mysql:dbname=oneline_bbs;host=localhost';
 $user = 'root';
 $password='';
@@ -8,50 +6,20 @@ $dbh = new PDO($dsn, $user, $password);
 $dbh->query('SET NAMES utf8');
 
 //SQL文を実行する
-if (!empty($_POST)) {
-  $nickname = $_POST['nickname'];
-  $comment = $_POST['comment'];
 
-  if (!empty($nickname||$comment)) {
-    $sql='INSERT INTO `posts`(`nickname`,`comment`,`created`) VALUES(?,?,?)';
-    //インジェクション
-    $data[]=$nickname;
-    $data[]=$comment;
-    $data[]=date("Y-m-d H:i:s");
+$id = $_GET['id'];
 
-    $stmt=$dbh->prepare($sql);
-    $stmt->execute($data);
-  }
-}
+$sql='SELECT * FROM `posts` WHERE `id`=?';
+$data[]=$id;
+$stmt= $dbh->prepare($sql);
+$stmt->execute($data);
 
-$dsn='mysql:dbname=oneline_bbs;host=localhost';
-$user='root';
-$password='';
-$dbh=new PDO($dsn,$user,$password);
-$dbh->query('SET NAMES utf8');
-
-$sql='SELECT * FROM `posts` ORDER BY created DESC';
-$stmt=$dbh->prepare($sql);
-$stmt->execute();
-
-$comments = array();
-
-while (1)
-{
-  $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-  if($rec==false)
-  {
-    break;
-  }
-  $comments[]=$rec;
-}
+$comment = $stmt->fetch(PDO::FETCH_ASSOC);
+//データベースの切断
 $dbh=null;
-
 ?>
 
 
-<!DOCTYPE html>
-<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>セブ掲示版</title>
@@ -83,9 +51,9 @@ $dbh=null;
               </ul>
           </div>
           <!-- /.navbar-collapse -->
-      </div>
+        </div>
       <!-- /.container-fluid -->
-  </nav>
+     </nav>
 
   <!-- Bootstrapのcontainer -->
   <div class="container">
@@ -95,18 +63,19 @@ $dbh=null;
       <!-- 画面左側 -->
       <div class="col-md-4 content-margin-top">
         <!-- form部分 -->
-        <form action="bbs.php" method="post">
+        <form action="update.php" method="post">
           <!-- nickname -->
           <div class="form-group">
             <div class="input-group">
-              <input type="text" name="nickname" class="form-control" id="validate-text" placeholder="nickname" required>
+              <input type="text" name="nickname" class="form-control" id="validate-text" placeholder="nickname" required value="<?php echo $comment['nickname'] ?>">
+              <input type="hidden" name="id" value="<?php echo $comment['id'] ?>">
               <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
             </div>
           </div>
           <!-- comment -->
           <div class="form-group">
             <div class="input-group" data-validate="length" data-length="4">
-              <textarea type="text" class="form-control" name="comment" id="validate-length" placeholder="comment" required></textarea>
+              <textarea type="text" class="form-control" name="comment" id="validate-length" placeholder="comment" required><?php echo $comment['comment'] ?></textarea>
               <span class="input-group-addon danger"><span class="glyphicon glyphicon-remove"></span></span>
             </div>
           </div>
@@ -114,43 +83,6 @@ $dbh=null;
           <button type="submit" class="btn btn-primary col-xs-12" disabled>つぶやく</button>
         </form>
       </div>
-
-      <!-- 画面右側 -->
-      <div class="col-md-8 content-margin-top">
-        <div class="timeline-centered">
-          <?php foreach ($comments as $comment): ?>
-          <article class="timeline-entry">
-              <div class="timeline-entry-inner">
-                  <div class="timeline-icon bg-success">
-                      <i class="entypo-feather"></i>
-                      <i class="fa fa-cogs"></i>
-                  </div>
-                  <div class="timeline-label">
-                      <h2><a href="#"><?php echo $comment['nickname']?></a>
-                        <span><?php echo $comment['created']?></span>
-                      </h2>
-                      <p><?php echo $comment['comment']?></p>
-
-                      <!-- 削除ボタン -->
-                      <a href="delete.php?id=<?php echo $comment["id"]; ?>" class="btn btn-danger">削除</a>
-
-                      <!-- 編集ボタン -->
-                      <a href="edit.php?id=<?php echo $comment["id"]; ?>" class="btn btn-success">編集</a>
-                  </div>
-              </div>
-          </article>
-          <?php endforeach; ?>
-
-          <article class="timeline-entry begin">
-              <div class="timeline-entry-inner">
-                  <div class="timeline-icon" style="-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg);">
-                      <i class="entypo-flight"></i> +
-                  </div>
-              </div>
-          </article>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -161,6 +93,3 @@ $dbh=null;
   <script src="assets/js/form.js"></script>
 </body>
 </html>
-
-
-
