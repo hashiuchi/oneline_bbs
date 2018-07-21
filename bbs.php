@@ -121,10 +121,10 @@ $dbh=null;
           <?php foreach ($comments as $comment): ?>
           <article class="timeline-entry">
               <div class="timeline-entry-inner">
-                  <div class="timeline-icon bg-success">
+                  <!-- <div class="timeline-icon bg-success">
                       <i class="entypo-feather"></i>
                       <i class="fa fa-cogs"></i>
-                  </div>
+                  </div> -->
                   <div class="timeline-label">
                       <h2><a href="#"><?php echo $comment['nickname']?></a>
                         <span><?php echo $comment['created']?></span>
